@@ -9,6 +9,12 @@ public class UnionFind1 extends UnionFind {
 	public UnionFind1(int size) {
 		super(size);
 	}
+
+	@Override
+	protected int find(int n) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	
 //	@Override
 //	public int find(int n) {

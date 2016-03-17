@@ -4,9 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-class GraphException extends Exception {
-	//stub
-}
 
 /*First iteration, implements Dijkstra's algorithm to determine shortest path
  * between two vertices. Tightly coupled with hash map and uses an adjacency
