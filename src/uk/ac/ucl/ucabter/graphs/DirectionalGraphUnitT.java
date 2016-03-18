@@ -22,7 +22,7 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 		graph.addVertex("C");
 		graph.addVertex("D");
 		graph.addVertex("E");
-		graph.addVertex("F");
+		graph.addVertex("F");//size = 7
 		//add edges
 		graph.insertEdge("A", "B", 5);
 		graph.insertEdge("A", "C", 10);
@@ -136,6 +136,29 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 		path.addEdge(lastEdge);
 		assertEquals(lastEdge, path.edgesInOrder.getFirst());
 		assertEquals(edge, path.edgesInOrder.getLast());
+	}
+	
+	@Test
+	public void testDFTraverse() {
+		Map<String, Boolean> visited = new HashMap<String, Boolean>();
+		
+		visited = graph.dfTraverse("A", visited);
+		assertTrue(visited.get("A"));
+		assertTrue(visited.get("B"));
+		assertTrue(visited.get("C"));
+		assertTrue(visited.get("D"));
+		assertTrue(visited.get("E"));
+		assertTrue(visited.get("F"));
+
+		visited = new HashMap<String, Boolean>();
+		visited = graph.dfTraverse("D", visited);
+		assertNull(visited.get("A"));
+		assertNull(visited.get("B"));
+		assertNull(visited.get("C"));
+		assertTrue(visited.get("D"));
+		assertTrue(visited.get("E"));
+		assertTrue(visited.get("F"));
+		
 	}
 	
 //	@Test

@@ -140,4 +140,24 @@ public class DirectionalGraph implements Graph {
 	}
 	
 	
+	/*Visits the graph depth-first from currentVertex parameter, returns a 
+	 * record of vertices visited as a map from vertices labes to true boolean
+	 * objects */
+	protected Map<String, Boolean> dfTraverse(String currentVertex, 
+			Map<String, Boolean> visited) {
+		
+		//visit action
+		visited.put(currentVertex, true);
+		
+		Iterator<Edge> edgePointer = vertices.get(currentVertex).iterator();
+		while(edgePointer.hasNext()) {
+			Edge current = edgePointer.next();
+			if(visited.get(current.terminal) == null)
+				dfTraverse(current.terminal, visited);
+		}
+		
+		return visited;
+	}
+	
+	
 }
