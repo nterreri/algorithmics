@@ -5,7 +5,9 @@ import java.util.*;
 import uk.ac.ucl.ucabter.graphs.DirectionalGraph.Edge;
 
 /*Concrete implementation of an adjacency-list based, weighted directional 
- * graph.
+ * graph. The implementation is adapted from lecture notes delivered by 
+ * Jens Kirke at UCL and a book on data structures by C. Shaffer, available 
+ * here: http://people.cs.vt.edu/~shaffer/Book/
  * 
  * It provides facilities to:
  * <ol>
@@ -14,7 +16,8 @@ import uk.ac.ucl.ucabter.graphs.DirectionalGraph.Edge;
  * <li>The shortest route between two points</li>
  * </ol>*/
 public class DirectionalGraph implements Graph {
-	private HashMap<String, LinkedList<Edge>> vertices;
+	protected HashMap<String, LinkedList<Edge>> vertices;//record of vertices
+	protected Map<String, Boolean> mark;//record of visited bits
 	
 	/*Inner class defining each list element as a terminal, value pair. 
 	 * The terminal is the vertex in the graph to which the edge is directed,
@@ -143,10 +146,11 @@ public class DirectionalGraph implements Graph {
 	/*Visits the graph depth-first from currentVertex parameter, returns a 
 	 * record of vertices visited as a map from vertices labes to true boolean
 	 * objects */
-	protected Map<String, Boolean> dfTraverse(String currentVertex, 
+	protected Map<String, List<Path>> dfTraverse(String currentVertex, 
 			Map<String, Boolean> visited) {
 		
 		//visit action
+		//addEdge to path (from where? return it to what?)
 		visited.put(currentVertex, true);
 		
 		Iterator<Edge> edgePointer = vertices.get(currentVertex).iterator();
@@ -156,8 +160,13 @@ public class DirectionalGraph implements Graph {
 				dfTraverse(current.terminal, visited);
 		}
 		
-		return visited;
+		return null;
 	}
 	
-	
+	/*Traverses the graph from the argument starting vertex*/
+	public void doTraversal(String start) {
+		//initialize mark record, record of visited vertices
+		mark = new HashMap<String, Boolean>(vertices.size());
+		dfTraverse(start, mark);
+	}
 }

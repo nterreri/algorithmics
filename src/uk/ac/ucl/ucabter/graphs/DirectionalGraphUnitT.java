@@ -142,7 +142,7 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 	public void testDFTraverse() {
 		Map<String, Boolean> visited = new HashMap<String, Boolean>();
 		
-		visited = graph.dfTraverse("A", visited);
+		graph.dfTraverse("A", visited);
 		assertTrue(visited.get("A"));
 		assertTrue(visited.get("B"));
 		assertTrue(visited.get("C"));
@@ -151,7 +151,7 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 		assertTrue(visited.get("F"));
 
 		visited = new HashMap<String, Boolean>();
-		visited = graph.dfTraverse("D", visited);
+		graph.dfTraverse("D", visited);
 		assertNull(visited.get("A"));
 		assertNull(visited.get("B"));
 		assertNull(visited.get("C"));
