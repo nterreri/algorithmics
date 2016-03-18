@@ -40,27 +40,44 @@ public class DirectionalGraph implements Graph {
 		}
 	}
 	
+	/*Inner class providing structured definition of a path (route) within the 
+	 * network, alternative to String[].*/
+	protected class Path {
+		protected LinkedList<Edge> edgesInOrder = new LinkedList<Edge>();
+		
+		protected Path() {}
+		
+		/*Appends an edge to the beginning of the path*/
+		protected void addEdge(Edge e) {
+			edgesInOrder.addFirst(e);
+		}
+	}
+	
 	/*Constructs a default instance with an initial capacity of 10 that 
 	 * increases automatically*/
 	public DirectionalGraph() {
 		Init(10);
 	}
 	
+	
 	/*ConstructorS auxilliary method*/
 	private void Init(int size) {
 		vertices = new HashMap<String, LinkedList<Edge>>(size);
 	}
+	
 	
 	/*Adds a new vertex to the graph*/
 	public void addVertex(String vertex) {
 		vertices.put(vertex, new LinkedList<Edge>());
 	}
 	
+	
 	/*Returns a list of all vertices reachable from this vertex*/
 	public LinkedList<Edge> getEdges(String vertex) {
 		LinkedList<Edge> edges = vertices.get(vertex);
 		return (edges == null ? null : edges);
 	}
+	
 	
 	/*Inserts an edge of specified cost (weight) from vertex start to vertex 
 	 * destination*/
@@ -80,12 +97,11 @@ public class DirectionalGraph implements Graph {
 			if(current.terminal.compareTo(destination) == 0)
 				throw new 
 				GraphException("edge already exists between vertices");
-
 		}
-		
 		
 		edges.add(new Edge(destination, cost));
 	}
+	
 	
 	/*Returns the cost (weight) of the edge between two directly connected 
 	 * vertices (neighbours)  */
@@ -95,7 +111,7 @@ public class DirectionalGraph implements Graph {
 		boolean found = false;
 		Iterator<Edge> edgePointer = vertices.get(start).iterator();
 		
-		//destination must be in list
+		//destination must be in list of vertices reachable from the start
 		while(edgePointer.hasNext()) {
 			Edge current = edgePointer.next();
 			if(current.terminal.compareTo(destination) == 0) {
@@ -109,9 +125,10 @@ public class DirectionalGraph implements Graph {
 		return result;	
 	}
 	
+	
 	/*Returns the cost of a path between two vertices, will throw an exception 
 	 * in case the path indicated is invalid*/
-	public int cost(String[] path) throws GraphException{
+	public int cost(String[] path) throws GraphException {
 		if(path.length <= 1)
 			throw new GraphException("path too short");
 		

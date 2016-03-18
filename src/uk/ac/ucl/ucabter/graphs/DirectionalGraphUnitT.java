@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import uk.ac.ucl.ucabter.graphs.DirectionalGraph.Edge;
 
-public class DirectionalGraphUnitT {
+public class DirectionalGraphUnitT extends DirectionalGraph {
 	DirectionalGraph graph;
 	
 	@Before
@@ -50,7 +50,6 @@ public class DirectionalGraphUnitT {
 	public void testConstructor() {
 		assertNotNull(graph);
 	}
-
 	
 	@Test
 	public void testGetEdges() {
@@ -125,6 +124,18 @@ public class DirectionalGraphUnitT {
 		String[] path = {"A"};
 		assertEquals(15, graph.cost(path));
 		
+	}
+	
+	@Test
+	public void testPathAddEdge() {
+		Path path = new Path();
+		Edge edge = new Edge("F", 1);
+		path.addEdge(edge);
+		assertEquals(edge, path.edgesInOrder.getFirst());
+		Edge lastEdge = new Edge("F", 2);
+		path.addEdge(lastEdge);
+		assertEquals(lastEdge, path.edgesInOrder.getFirst());
+		assertEquals(edge, path.edgesInOrder.getLast());
 	}
 	
 //	@Test
