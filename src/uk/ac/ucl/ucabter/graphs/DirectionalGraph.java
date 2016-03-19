@@ -131,8 +131,7 @@ public class DirectionalGraph implements Graph {
 			throw new GraphException("no such destination vertex");
 		return result;	
 	}
-	
-	
+		
 	/*Returns the cost of a path between two vertices, will throw an exception 
 	 * in case the path indicated is invalid*/
 	public int cost(String[] path) throws GraphException {
@@ -252,8 +251,77 @@ public class DirectionalGraph implements Graph {
 	
 	/*Calculates the length of the shortest path between two vertices in the 
 	 * graph*/
-	public int shortestPath(String start, String destination) {
+	public int shortestPath(String start, String destination) 
+			throws GraphException {
 		
-		return 0;
+		return dijkstraShortestPath(start, destination);
+	}
+	
+	/*Implementation of Dijkstra's algorithm based on Map to Lists graph 
+	 * structure. Delegated to by shortestPath() interface method*/
+	private int dijkstraShortestPath(String start, String destination)
+			throws GraphException {
+		//reserve memory to store distances from start to each vertex, and to
+		//keep track of which vertices have already been explored/exhausted/
+		//visited
+		mark = new HashMap<String, Boolean>(vertices.size());
+		Set<String> verticesSet = vertices.keySet();
+		
+		//initialize record of all distances 
+		HashMap<String, Integer> distances = 
+				new HashMap<String, Integer>(vertices.size());
+		
+		//Stage 1: initialize all distances based on immediate accessiblity 
+		//from start (i.e. from weight of edge between start and vertex, 
+		//if any)
+		
+		//Initialize all distances to positive infinity
+		for(String vertex : verticesSet) 
+			distances.put(vertex, Integer.MAX_VALUE);
+		//then compute actual distances from starting vertex to immediately
+		//accessible vertices
+		for(Edge edge : vertices.get(start)) {
+			int cost = costNeighbour(start, edge.terminal);
+			distances.put(edge.terminal, cost);
+		}
+		
+		mark.put(start, true);
+		String vertexPointer = start;
+		
+		//outer loop for stages 2 and 3
+		for(int i = 0; i < vertices.size(); i++) {
+			//set minimum distance variable to positive infinity
+			int min = Integer.MAX_VALUE; 
+			
+			//Stage 2: determine next vertex closest to starting vertex 
+			//(shortest path from startingVertex), from the current vertex 
+			//pointer
+			for(String vertex : verticesSet) {
+				int distanceRecord = distances.get(vertex);
+				//if the vertex has not been visited, 
+				if(mark.get(vertex) == null && distanceRecord < min) {
+					vertexPointer = vertex;//update pointer
+					min = distanceRecord;//update smallest distance record for
+					//target
+				}
+			}
+			
+			mark.put(vertexPointer, true);
+			
+			//Stage 3: update distances if element is reachable from current
+			//vertex pointer and path from current vertex pointer to element is
+			//shorter than recorded distance between start and element
+			//That is, if there is a shorter path to the pointer element than
+			//the one currently recorded
+			for(Edge edge : vertices.get(vertexPointer)) {
+				int cost = costNeighbour(vertexPointer, edge.terminal);
+				int costFromStartingVertex = cost + min;
+				if(costFromStartingVertex < distances.get(edge.terminal))
+					distances.put(edge.terminal, costFromStartingVertex);
+			}
+			
+		}
+		
+		return distances.get(destination);
 	}
 }

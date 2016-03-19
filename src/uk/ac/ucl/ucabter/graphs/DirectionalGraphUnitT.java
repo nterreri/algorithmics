@@ -200,8 +200,11 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 	}
 	
 	@Test
-	public void testShortestPath() {
-		assertEquals(3, acyclicalGraph.shortestPath("A", "F"));
+	public void testShortestPath() throws GraphException {
+		assertEquals(16, acyclicalGraph.shortestPath("A", "F"));
+		
+		assertEquals(9, generalGraph.shortestPath("A", "C"));
+		assertEquals(9, generalGraph.shortestPath("B", "B"));
 	}
 	
 //	@Test
