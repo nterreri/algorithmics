@@ -194,6 +194,15 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 		assertEquals(3, generalGraph.pathsTo("A", "C", 4, Conditions.EXACT));
 	}
 	
+	@Test(expected=GraphException.class)
+	public void testPathsToException() throws GraphException {
+		generalGraph.pathsTo("INVALID", "INVALID", -50 , Conditions.EXACT);
+	}
+	
+	@Test
+	public void testShortestPath() {
+		assertEquals(3, acyclicalGraph.shortestPath("A", "F"));
+	}
 	
 //	@Test
 //	public void testPrint() {

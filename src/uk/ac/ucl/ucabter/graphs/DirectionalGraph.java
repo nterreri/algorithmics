@@ -183,7 +183,9 @@ public class DirectionalGraph implements Graph {
 	 * routes, that visit the same vertex multiple times) without looping 
 	 * indefinitely. */
 	public int pathsTo(String start, String destination, int limit, 
-			Conditions c) {
+			Conditions c) throws GraphException {
+		if(vertices.get(start) == null || vertices.get(destination) == null)
+			throw new GraphException("No such vertex");
 		
 		switch(c) {
 		case LESSTHAN:
@@ -248,4 +250,10 @@ public class DirectionalGraph implements Graph {
 		return accumulator;
 	}
 	
+	/*Calculates the length of the shortest path between two vertices in the 
+	 * graph*/
+	public int shortestPath(String start, String destination) {
+		
+		return 0;
+	}
 }
