@@ -19,6 +19,11 @@ public class DirectionalGraph implements Graph {
 	protected HashMap<String, LinkedList<Edge>> vertices;//record of vertices
 	protected Map<String, Boolean> mark;//record of visited bits
 	
+	public static enum Conditions {
+		EXACT,
+		LESSTHAN
+	}
+	
 	/*Inner class defining each list element as a terminal, value pair. 
 	 * The terminal is the vertex in the graph to which the edge is directed,
 	 * the integer is the cost or weight associated with the edge.*/
@@ -40,6 +45,11 @@ public class DirectionalGraph implements Graph {
 		
 		public int getWeight()  {
 			return weight;
+		}
+	
+		@Override
+		public String toString() {
+			return this.terminal.toString();
 		}
 	}
 	
@@ -76,7 +86,7 @@ public class DirectionalGraph implements Graph {
 	
 	
 	/*Returns a list of all vertices reachable from this vertex*/
-	public LinkedList<Edge> getEdges(String vertex) {
+	public LinkedList<Edge> edges(String vertex) {
 		LinkedList<Edge> edges = vertices.get(vertex);
 		return (edges == null ? null : edges);
 	}
@@ -146,7 +156,7 @@ public class DirectionalGraph implements Graph {
 	/*Visits the graph depth-first from currentVertex parameter, returns a 
 	 * record of vertices visited as a map from vertices labes to true boolean
 	 * objects */
-	protected Map<String, List<Path>> dfTraverse(String currentVertex, 
+	protected void dfTraverse(String currentVertex, 
 			Map<String, Boolean> visited) {
 		
 		//visit action
@@ -160,7 +170,6 @@ public class DirectionalGraph implements Graph {
 				dfTraverse(current.terminal, visited);
 		}
 		
-		return null;
 	}
 	
 	/*Traverses the graph from the argument starting vertex*/
@@ -168,5 +177,42 @@ public class DirectionalGraph implements Graph {
 		//initialize mark record, record of visited vertices
 		mark = new HashMap<String, Boolean>(vertices.size());
 		dfTraverse(start, mark);
+	}
+
+	/*Computes number of paths from start to destination that meet the limit 
+	 * condition. Conditions are allowed to be either EXACT or LESSTHAN, 
+	 * meaning only values that exactly match the limit parameter or are less 
+	 * than the limit parameter, respectively, will be counted. Since the graph
+	 * is directional but not acyclical (allows cycles).<p>
+	 * 
+	 * Such conditions are necessary in order to allow graph traversals to 
+	 * revisit vertices after they have been visited (allows for cyclical 
+	 * routes, that visit the same vertex multiple times) without looping 
+	 * indefinitely. */
+	public int pathsTo(String start, String destination, int limit, 
+			Conditions c) {
+		
+		switch(c) {
+		case LESSTHAN:
+			return pathsToLessThan(start, destination, limit);
+		default:
+			return 0;
+		}
+	}
+	
+	/*Computes all available path from start to destination that take less than
+	 * the limit parameter number of junctures*/
+	protected int pathsToLessThan(String start, String destination, int limit) {
+		int accumulator = 0;
+
+		for(Edge edge : edges(start)) {
+			if(edge.terminal == destination)
+				++accumulator;
+			else if(!edges(edge.terminal).isEmpty())
+				accumulator += 
+				pathsToLessThan(edge.terminal, destination, limit - 1);
+		}
+
+		return accumulator;
 	}
 }

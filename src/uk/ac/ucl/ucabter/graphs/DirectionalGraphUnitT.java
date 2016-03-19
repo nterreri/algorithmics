@@ -53,20 +53,20 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 	
 	@Test
 	public void testGetEdges() {
-		assertTrue(graph.getEdges("F").isEmpty());
+		assertTrue(graph.edges("F").isEmpty());
 		//TODO check edges
 	}
 	
 	@Test
 	public void testAddVertex() {
 		graph.addVertex("Z");
-		assertNotNull(graph.getEdges("Z"));
+		assertNotNull(graph.edges("Z"));
 	}
 	
 	@Test
 	public void testInsertEdge() throws GraphException {
 		graph.insertEdge("C", "D", 5);
-		LinkedList<Edge> edges = graph.getEdges("C");
+		LinkedList<Edge> edges = graph.edges("C");
 		assertFalse(edges.isEmpty());
 		
 		//expect D to be the second element in list of edges from D
@@ -158,6 +158,15 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 		assertTrue(visited.get("D"));
 		assertTrue(visited.get("E"));
 		assertTrue(visited.get("F"));
+		
+	}
+
+	@Test
+	public void testPathsTo() {
+		assertEquals(5, graph.pathsTo("A", "F", 10, 
+				DirectionalGraph.Conditions.LESSTHAN));
+		assertEquals(0, graph.pathsTo("A", "F", 1, 
+				DirectionalGraph.Conditions.LESSTHAN));
 		
 	}
 	
