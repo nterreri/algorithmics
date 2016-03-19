@@ -218,6 +218,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 	/***/
 	protected int pathsToLessThanCost(V start, V destination, int limit) {
 		//TODO
+		return 0;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ucl.ucabter.graphs.RoutableGraph#shortestPath(V, V)
