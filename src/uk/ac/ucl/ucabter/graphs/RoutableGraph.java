@@ -1,7 +1,7 @@
 package uk.ac.ucl.ucabter.graphs;
 
-/**Interface exposing methods to get information about the current state of a 
- * graph.<p>
+/**Interface exposing methods to get information about the current global state 
+ * of a graph.<p>
  * 
  * Aimed in particular at directed, weighted graphs.*/
 public interface RoutableGraph<V, E> {

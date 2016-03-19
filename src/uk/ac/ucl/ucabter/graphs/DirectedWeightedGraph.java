@@ -21,7 +21,10 @@ import java.util.*;
  * adequately, particularly with regards to the shortest path algorithm 
  * implemented (Dijkstra's). An adjacency list, in fact, contains no more than
  * the accessible nodes, unlike an adjacency matrix, where memory is reserved
- * a-priori to store an edge from one vertex to any other. For an example of 
+ * a-priori to store an edge from one vertex to any other, and only the existing
+ * edges are considered when looking for the shortest paths between the start 
+ * vertex and every other vertex. This is more advantageous when the graph is 
+ * sparse (as opposed to dense) see Shaffer, page 373-376. For an example of 
  * an adjacency matrix implementation, please refer to Shaffer, page 379.<p>
  * 
  * The current implementation uses HashMap, HashSet and LinkedList, but could 
