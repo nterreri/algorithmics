@@ -10,31 +10,49 @@ import org.junit.Test;
 import uk.ac.ucl.ucabter.graphs.DirectionalGraph.Edge;
 
 public class DirectionalGraphUnitT extends DirectionalGraph {
-	DirectionalGraph graph;
+	DirectionalGraph acyclicalGraph;
+	DirectionalGraph generalGraph;
 	
 	@Before
 	public void constructInstance() throws GraphException {
 		//create instance
-		graph = new DirectionalGraph();
+		acyclicalGraph = new DirectionalGraph();
 		//add vertices
-		graph.addVertex("A");
-		graph.addVertex("B");
-		graph.addVertex("C");
-		graph.addVertex("D");
-		graph.addVertex("E");
-		graph.addVertex("F");//size = 7
+		acyclicalGraph.addVertex("A");
+		acyclicalGraph.addVertex("B");
+		acyclicalGraph.addVertex("C");
+		acyclicalGraph.addVertex("D");
+		acyclicalGraph.addVertex("E");
+		acyclicalGraph.addVertex("F");//size = 7
 		//add edges
-		graph.insertEdge("A", "B", 5);
-		graph.insertEdge("A", "C", 10);
-		graph.insertEdge("B", "C", 4);
-		graph.insertEdge("B", "E", 5);
-		graph.insertEdge("B", "D", 10);
-		graph.insertEdge("C", "E", 1);
-		graph.insertEdge("D", "F", 1);
-		graph.insertEdge("D", "E", 2);
-		graph.insertEdge("E", "F", 10);
+		acyclicalGraph.insertEdge("A", "B", 5);
+		acyclicalGraph.insertEdge("A", "C", 10);
+		acyclicalGraph.insertEdge("B", "C", 4);
+		acyclicalGraph.insertEdge("B", "E", 5);
+		acyclicalGraph.insertEdge("B", "D", 10);
+		acyclicalGraph.insertEdge("C", "E", 1);
+		acyclicalGraph.insertEdge("D", "F", 1);
+		acyclicalGraph.insertEdge("D", "E", 2);
+		acyclicalGraph.insertEdge("E", "F", 10);
 		
-
+		//create other instance
+		generalGraph = new DirectionalGraph();
+		//add vertices
+		generalGraph.addVertex("A");
+		generalGraph.addVertex("B");
+		generalGraph.addVertex("C");
+		generalGraph.addVertex("D");
+		generalGraph.addVertex("E");//size = 6
+		//add edges
+		generalGraph.insertEdge("A", "B", 5);
+		generalGraph.insertEdge("B", "C", 4);
+		generalGraph.insertEdge("C", "D", 7);
+		generalGraph.insertEdge("D", "C", 8);
+		generalGraph.insertEdge("D", "E", 6);
+		generalGraph.insertEdge("A", "D", 5);
+		generalGraph.insertEdge("C", "E", 2);
+		generalGraph.insertEdge("E", "B", 3);
+		generalGraph.insertEdge("A", "E", 7);
 	}
 	
 //	@Test
@@ -48,25 +66,25 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 	
 	@Test
 	public void testConstructor() {
-		assertNotNull(graph);
+		assertNotNull(acyclicalGraph);
 	}
 	
 	@Test
 	public void testGetEdges() {
-		assertTrue(graph.edges("F").isEmpty());
+		assertTrue(acyclicalGraph.edges("F").isEmpty());
 		//TODO check edges
 	}
 	
 	@Test
 	public void testAddVertex() {
-		graph.addVertex("Z");
-		assertNotNull(graph.edges("Z"));
+		acyclicalGraph.addVertex("Z");
+		assertNotNull(acyclicalGraph.edges("Z"));
 	}
 	
 	@Test
 	public void testInsertEdge() throws GraphException {
-		graph.insertEdge("C", "D", 5);
-		LinkedList<Edge> edges = graph.edges("C");
+		acyclicalGraph.insertEdge("C", "D", 5);
+		LinkedList<Edge> edges = acyclicalGraph.edges("C");
 		assertFalse(edges.isEmpty());
 		
 		//expect D to be the second element in list of edges from D
@@ -78,51 +96,51 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 	@Test(expected=GraphException.class)
 	public void testInsertEdgeExceptionInvalid() throws GraphException {
 
-		graph.insertEdge("A", "INVALID", 5);
+		acyclicalGraph.insertEdge("A", "INVALID", 5);
 	}
 	
 	@Test(expected=GraphException.class)
 	public void testInsertEdgeExceptionDuplicate() throws GraphException {
 
-		graph.insertEdge("C", "D", 5);
-		graph.insertEdge("C", "D", 5);
+		acyclicalGraph.insertEdge("C", "D", 5);
+		acyclicalGraph.insertEdge("C", "D", 5);
 	}
 
 	@Test
 	public void testCostNeighbour() throws GraphException {
-		assertEquals(5, graph.costNeighbour("A", "B"));
+		assertEquals(5, acyclicalGraph.costNeighbour("A", "B"));
 	}
 	
 	@Test(expected=GraphException.class)
 	public void testCostNeighbourWithException() throws GraphException {
-		assertEquals(5, graph.costNeighbour("A", "Z"));
+		assertEquals(5, acyclicalGraph.costNeighbour("A", "Z"));
 	}
 	
 	@Test
 	public void testCost() throws GraphException {
 		String[] path = {"A", "B", "D"};
-		assertEquals(15, graph.cost(path));
+		assertEquals(15, acyclicalGraph.cost(path));
 		
 		String[] path2 = {"B", "D", "E", "F"};
-		assertEquals(22, graph.cost(path2));
+		assertEquals(22, acyclicalGraph.cost(path2));
 
 		String[] path3 = {"A", "C", "E", "F"};
-		assertEquals(21, graph.cost(path3));
+		assertEquals(21, acyclicalGraph.cost(path3));
 
 		String[] path4 = {"A", "B", "E", "F"};
-		assertEquals(20, graph.cost(path4));
+		assertEquals(20, acyclicalGraph.cost(path4));
 	}
 	
 	@Test(expected=GraphException.class)
 	public void testCostNoSuchPath() throws GraphException {
 		String[] path = {"A", "B", "F"};
-		assertEquals(15, graph.cost(path));
+		assertEquals(15, acyclicalGraph.cost(path));
 	}
 	
 	@Test(expected=GraphException.class)
 	public void testCostTooShort() throws GraphException {
 		String[] path = {"A"};
-		assertEquals(15, graph.cost(path));
+		assertEquals(15, acyclicalGraph.cost(path));
 		
 	}
 	
@@ -142,7 +160,7 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 	public void testDFTraverse() {
 		Map<String, Boolean> visited = new HashMap<String, Boolean>();
 		
-		graph.dfTraverse("A", visited);
+		acyclicalGraph.dfTraverse("A", visited);
 		assertTrue(visited.get("A"));
 		assertTrue(visited.get("B"));
 		assertTrue(visited.get("C"));
@@ -151,7 +169,7 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 		assertTrue(visited.get("F"));
 
 		visited = new HashMap<String, Boolean>();
-		graph.dfTraverse("D", visited);
+		acyclicalGraph.dfTraverse("D", visited);
 		assertNull(visited.get("A"));
 		assertNull(visited.get("B"));
 		assertNull(visited.get("C"));
@@ -163,9 +181,12 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 
 	@Test
 	public void testPathsTo() {
-		assertEquals(5, graph.pathsTo("A", "F", 10, 
+		assertEquals(5, acyclicalGraph.pathsTo("A", "F", 10, 
 				DirectionalGraph.Conditions.LESSTHAN));
-		assertEquals(0, graph.pathsTo("A", "F", 1, 
+		assertEquals(0, acyclicalGraph.pathsTo("A", "F", 1, 
+				DirectionalGraph.Conditions.LESSTHAN));
+		
+		assertEquals(2, generalGraph.pathsTo("C", "C", 3, 
 				DirectionalGraph.Conditions.LESSTHAN));
 		
 	}

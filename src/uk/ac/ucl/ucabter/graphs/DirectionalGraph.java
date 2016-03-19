@@ -72,7 +72,6 @@ public class DirectionalGraph implements Graph {
 		Init(10);
 	}
 	
-	
 	/*ConstructorS auxilliary method*/
 	private void Init(int size) {
 		vertices = new HashMap<String, LinkedList<Edge>>(size);
@@ -152,7 +151,6 @@ public class DirectionalGraph implements Graph {
 		return accumulator;
 	}
 	
-	
 	/*Visits the graph depth-first from currentVertex parameter, returns a 
 	 * record of vertices visited as a map from vertices labes to true boolean
 	 * objects */
@@ -195,19 +193,30 @@ public class DirectionalGraph implements Graph {
 		switch(c) {
 		case LESSTHAN:
 			return pathsToLessThan(start, destination, limit);
+		case EXACT:
+			//TODO
 		default:
 			return 0;
 		}
 	}
 	
-	/*Computes all available path from start to destination that take less than
-	 * the limit parameter number of junctures*/
+	/*Computes recursively all available paths from start to destination that 
+	 * take less than or exactly the limit parameter number of junctures*/
 	protected int pathsToLessThan(String start, String destination, int limit) {
 		int accumulator = 0;
 
+		//iterate through available edges from current node
 		for(Edge edge : edges(start)) {
-			if(edge.terminal == destination)
+			
+			//stop if no of junctures is strictly larger than limit
+			if(limit <= 0)
+				break;
+			
+			//increase path No accumulator if destination is reached
+			if(edge.terminal == destination) 
 				++accumulator;
+			
+			//recurse over next available non-terminal edge
 			else if(!edges(edge.terminal).isEmpty())
 				accumulator += 
 				pathsToLessThan(edge.terminal, destination, limit - 1);
@@ -215,4 +224,11 @@ public class DirectionalGraph implements Graph {
 
 		return accumulator;
 	}
+	
+	/*Computes recursively all available paths from start vertex to destination
+	 * that exactly match the limit on the number of junctures taken*/
+	protected int pathsToExactly(String start, String destination, int limit) {
+		return 0;
+	}
+	
 }
