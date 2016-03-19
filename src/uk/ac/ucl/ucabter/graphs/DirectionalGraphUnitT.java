@@ -158,24 +158,24 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 	
 	@Test
 	public void testDFTraverse() {
-		Map<String, Boolean> visited = new HashMap<String, Boolean>();
+		Set<String> visited = new HashSet<String>();
 		
 		acyclicalGraph.dfTraverse("A", visited);
-		assertTrue(visited.get("A"));
-		assertTrue(visited.get("B"));
-		assertTrue(visited.get("C"));
-		assertTrue(visited.get("D"));
-		assertTrue(visited.get("E"));
-		assertTrue(visited.get("F"));
+		assertTrue(visited.contains("A"));
+		assertTrue(visited.contains("B"));
+		assertTrue(visited.contains("C"));
+		assertTrue(visited.contains("D"));
+		assertTrue(visited.contains("E"));
+		assertTrue(visited.contains("F"));
 
-		visited = new HashMap<String, Boolean>();
+		visited = new HashSet<String>();
 		acyclicalGraph.dfTraverse("D", visited);
-		assertNull(visited.get("A"));
-		assertNull(visited.get("B"));
-		assertNull(visited.get("C"));
-		assertTrue(visited.get("D"));
-		assertTrue(visited.get("E"));
-		assertTrue(visited.get("F"));
+		assertFalse(visited.contains("A"));
+		assertFalse(visited.contains("B"));
+		assertFalse(visited.contains("C"));
+		assertTrue(visited.contains("D"));
+		assertTrue(visited.contains("E"));
+		assertTrue(visited.contains("F"));
 		
 	}
 

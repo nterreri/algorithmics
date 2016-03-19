@@ -17,7 +17,7 @@ import uk.ac.ucl.ucabter.graphs.DirectionalGraph.Edge;
  * </ol>*/
 public class DirectionalGraph implements Graph {
 	protected HashMap<String, LinkedList<Edge>> vertices;//record of vertices
-	protected Map<String, Boolean> mark;//record of visited bits
+	protected Set<String> mark;//record of visited bits
 	
 	/*Inner class defining each list element as a terminal, value pair. 
 	 * The terminal is the vertex in the graph to which the edge is directed,
@@ -68,8 +68,8 @@ public class DirectionalGraph implements Graph {
 	}
 	
 	/*ConstructorS auxilliary method*/
-	private void Init(int size) {
-		vertices = new HashMap<String, LinkedList<Edge>>(size);
+	private void Init(int capacity) {
+		vertices = new HashMap<String, LinkedList<Edge>>(capacity);
 	}
 	
 	
@@ -149,16 +149,15 @@ public class DirectionalGraph implements Graph {
 	 * record of vertices visited as a map from vertices labes to true boolean
 	 * objects */
 	protected void dfTraverse(String currentVertex, 
-			Map<String, Boolean> visited) {
+			Set<String> visited) {
 		
 		//visit action
-		//addEdge to path (from where? return it to what?)
-		visited.put(currentVertex, true);
+		visited.add(currentVertex);
 		
 		Iterator<Edge> edgePointer = vertices.get(currentVertex).iterator();
 		while(edgePointer.hasNext()) {
 			Edge current = edgePointer.next();
-			if(visited.get(current.terminal) == null)
+			if(!visited.contains(current.terminal))
 				dfTraverse(current.terminal, visited);
 		}
 		
@@ -167,7 +166,7 @@ public class DirectionalGraph implements Graph {
 	/*Traverses the graph from the argument starting vertex*/
 	public void doTraversal(String start) {
 		//initialize mark record, record of visited vertices
-		mark = new HashMap<String, Boolean>(vertices.size());
+		mark = new HashSet<String>(vertices.size() + 1, 1.0f);
 		dfTraverse(start, mark);
 	}
 
@@ -264,12 +263,16 @@ public class DirectionalGraph implements Graph {
 		//reserve memory to store distances from start to each vertex, and to
 		//keep track of which vertices have already been explored/exhausted/
 		//visited
-		mark = new HashMap<String, Boolean>(vertices.size());
+		mark = new HashSet<String>(vertices.size() + 1, 1.0f);
 		Set<String> verticesSet = vertices.keySet();
 		
-		//initialize record of all distances 
+		//initialize record of all distances
+		//setting the initial capacity to 1 more than the size of the vertex map
+		//setting load factor to 100% in order to ensure the hashmap will never
+		//be rehashed while it exists 
+		// see https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html
 		HashMap<String, Integer> distances = 
-				new HashMap<String, Integer>(vertices.size());
+				new HashMap<String, Integer>(vertices.size() + 1, 1.0f);
 		
 		//Stage 1: initialize all distances based on immediate accessiblity 
 		//from start (i.e. from weight of edge between start and vertex, 
@@ -285,7 +288,7 @@ public class DirectionalGraph implements Graph {
 			distances.put(edge.terminal, cost);
 		}
 		
-		mark.put(start, true);
+		mark.add(start);
 		String vertexPointer = start;
 		
 		//outer loop for stages 2 and 3
@@ -299,14 +302,14 @@ public class DirectionalGraph implements Graph {
 			for(String vertex : verticesSet) {
 				int distanceRecord = distances.get(vertex);
 				//if the vertex has not been visited, 
-				if(mark.get(vertex) == null && distanceRecord < min) {
+				if(!mark.contains(vertex) && distanceRecord < min) {
 					vertexPointer = vertex;//update pointer
 					min = distanceRecord;//update smallest distance record for
 					//target
 				}
 			}
 			
-			mark.put(vertexPointer, true);
+			mark.add(vertexPointer);
 			
 			//Stage 3: update distances if element is reachable from current
 			//vertex pointer and path from current vertex pointer to element is
