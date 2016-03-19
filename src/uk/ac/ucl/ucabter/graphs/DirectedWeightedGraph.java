@@ -13,7 +13,20 @@ import java.util.*;
  * Many thanks also to Jens Krinke ( http://www0.cs.ucl.ac.uk/people/J.Krinke.html ),
  * who taught the author about data structures and algorithms.<p>
  * 
- * The current implementation uses HashMap, HashSet and LinkedList.<p>
+ * Given the choice of adjacency lists, retrieval, deletion and insertion will
+ * come close to linear search as the graph gets larger, but since the required
+ * capabilities do not relate to changing the state of the data structure, or 
+ * querying the state of local parts of it, but rather querying different 
+ * information about its state globally, the implementation should perform 
+ * adequately, particularly with regards to the shortest path algorithm 
+ * implemented (Dijkstra's). An adjacency list, in fact, contains no more than
+ * the accessible nodes, unlike an adjacency matrix, where memory is reserved
+ * a-priori to store an edge from one vertex to any other. For an example of 
+ * an adjacency matrix implementation, please refer to Shaffer, page 379.<p>
+ * 
+ * The current implementation uses HashMap, HashSet and LinkedList, but could 
+ * in principle be extended to delegate to other classes implementing the 
+ * Map, Set and List interface respectively.<p>
  * 
  * It provides facilities to:
  * <ol>
@@ -41,8 +54,12 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 		InitHashMap(capacity);
 	}
 	
+	/**Delegated to by Init, other similar methods may be added to change the 
+	 * underlying structures so long as they conform to the Map and Set 
+	 * interfaces*/
 	private void InitHashMap(int capacity) {
 		vertices = new HashMap<V, List<E>>(capacity);
+		mark = new HashSet<V>(capacity);
 	}
 		
 	/**Adds a new vertex to the graph*/
@@ -57,31 +74,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 	/**Returns a list of all vertices reachable from this vertex*/
 	public List<E> edges(V vertex) {
 		List<E> edges = vertices.get(vertex);
-		return (edges == null ? null : edges);
-	}
-	
-	/**Inserts an edge of specified cost (weight) from vertex start to vertex 
-	 * destination*/
-	public void insertEdge(V start, V destination, int cost) 
-			throws GraphException{
-		
-		//destination vertex must exist in graph
-		if(vertices.get(destination) == null) 
-			throw new GraphException("destination vertex not in graph");
-		
-		List<E> edges = vertices.get(start);
-		Iterator<E> edgePointer = edges.iterator();
-		
-		while(edgePointer.hasNext()) {
-			WeightedEdge<V> current = edgePointer.next();
-			//edge must not already exist
-			if(current.terminal == destination)
-				throw new 
-				GraphException("edge already exists between vertices");
-		}
-		
-		E edge = (E) new WeightedEdge<V>(destination, cost);
-		edges.add(edge);
+		return edges;
 	}
 	
 	/* (non-Javadoc)
@@ -168,7 +161,8 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 	}
 	
 	/**Computes recursively all available paths from start to destination that 
-	 * take less than or exactly the limit parameter number of junctures*/
+	 * take less than or exactly the limit parameter number of junctures. 
+	 * Further conditions may be added as other delegates*/
 	protected int pathsToLessThan(V start, V destination, int limit) {
 		//each recursion step uses its own local accumulator
 		int accumulator = 0;
@@ -194,7 +188,8 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 	}
 	
 	/**Computes recursively all available paths from start vertex to destination
-	 * that exactly match the limit on the number of junctures taken*/
+	 * that exactly match the limit on the number of junctures taken.
+	 * Further conditions may be added as other delegates*/
 	protected int pathsToExact(V start, V destination, int limit) {
 		//each recursion step uses its own local accumulator
 		int accumulator = 0;
@@ -220,6 +215,10 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 		return accumulator;
 	}
 	
+	/***/
+	protected int pathsToLessThanCost(V start, V destination, int limit) {
+		//TODO
+	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ucl.ucabter.graphs.RoutableGraph#shortestPath(V, V)
 	 */
@@ -309,6 +308,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 	}
 
 	//WeightedGraph interface
+	
 	@Override
 	public int vertexCount() {
 		
@@ -317,56 +317,138 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 
 	@Override
 	public int edgeCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		int accumulator = 0;
+		for(V vertex : vertices.keySet()) {
+			accumulator += vertices.get(vertex).size();
+		}
+		return accumulator;
 	}
 
 	@Override
-	public int first(V v) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int next(V v, V w) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void setEdge(V v, V w, int wght) {
-		// TODO Auto-generated method stub
+	public E first(V v) throws GraphException {
+		List<E> edges = vertices.get(v);
+		if(edges == null)
+			throw new GraphException("No such vertex");
 		
+		return (edges.isEmpty() ? null : edges.get(0));
 	}
 
 	@Override
-	public void delEdge(V v, V w) {
-		// TODO Auto-generated method stub
+	public E next(V v, V w) throws GraphException {
+		List<E> edges = vertices.get(v);
 		
+		if(edges == null || vertices.get(w) == null)
+			throw new GraphException("No such vertex");
+		
+		E result = null;
+		for(int i = 0; i < edges.size(); i++){
+			if(edges.get(i).getTerminal() == w) {
+				if(i < edges.size())
+					result = edges.get(i + 1);
+				else
+					throw new GraphException("No more vertices accessible after"
+							+ w);
+			}
+		}
+		
+		return result;
 	}
 
 	@Override
-	public boolean isEdge(V v, V w) {
-		// TODO Auto-generated method stub
-		return false;
+	public void setEdge(V start, V destination, int cost) 
+			throws GraphException{
+		
+		//destination vertex must exist in graph
+		if(vertices.get(start) == null || vertices.get(destination) == null) 
+			throw new GraphException("Vertex not in graph");
+		
+		List<E> edges = vertices.get(start);
+		Iterator<E> edgePointer = edges.iterator();
+		
+		while(edgePointer.hasNext()) {
+			WeightedEdge<V> current = edgePointer.next();
+			//edge must not already exist
+			if(current.terminal == destination)
+				throw new 
+				GraphException("edge already exists between vertices");
+		}
+		
+		
+		@SuppressWarnings("unchecked")
+		//should be safe as long as E extends WeightedEdge
+		E edge = (E) new WeightedEdge<V>(destination, cost);
+		edges.add(edge);
+	}
+
+	@Override
+	public void delEdge(V v, V w) throws GraphException {
+		if(vertices.get(v) == null || vertices.get(w) == null) 
+			throw new GraphException("Vertex not in graph");
+		
+		boolean found = false;
+		List<E> edges = vertices.get(v);
+		for(int i = 0; i < edges.size(); i++) {
+			if(edges.get(i).getTerminal() == w) {
+				edges.remove(i);
+				found = true;
+				break;
+			}
+		}
+		
+		if(!found)
+			throw new GraphException("No such edge");
+	}
+
+	@Override
+	public boolean isEdge(V v, V w) throws GraphException {
+		if(vertices.get(v) == null || vertices.get(w) == null) 
+			throw new GraphException("Vertex not in graph");
+		
+		List<E> edges = vertices.get(v);
+		boolean result = false;
+		
+		for(int i = 0; i < edges.size(); i++){
+			if(edges.get(i).getTerminal() == w) {
+				result = true;
+			}
+		}
+
+		return result;
 	}
 
 	@Override
 	public int weight(V v, V w) throws GraphException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void setMark(int v, int val) {
-		// TODO Auto-generated method stub
+		if(vertices.get(v) == null || vertices.get(w) == null) 
+			throw new GraphException("Vertex not in graph");
 		
+		int result = 0;
+		boolean found = false;
+		List<E> edges = vertices.get(v);
+		for(int i = 0; i < edges.size(); i++) {
+			E edge = edges.get(i);
+			if(edge.getTerminal() == w) {
+				result = edge.getWeight();
+				found = true;
+				break;
+			}
+		}
+		
+		if(!found)
+			throw new GraphException("No such edge");
+		
+		return result;
 	}
 
 	@Override
-	public int getMark(int v) {
-		// TODO Auto-generated method stub
-		return 0;
+	public void setMark(V v, int val) {
+		mark.add(v);
+	}
+	@Override
+	public int getMark(V v) {
+		if(mark.contains(v))
+			return 1;
+		else
+			return 0;
 	}
 	
 }

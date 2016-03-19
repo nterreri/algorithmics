@@ -23,15 +23,15 @@ public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
 		acyclicalGraph.addVertex("E");
 		acyclicalGraph.addVertex("F");//size = 7
 		//add edges
-		acyclicalGraph.insertEdge("A", "B", 5);
-		acyclicalGraph.insertEdge("A", "C", 10);
-		acyclicalGraph.insertEdge("B", "C", 4);
-		acyclicalGraph.insertEdge("B", "E", 5);
-		acyclicalGraph.insertEdge("B", "D", 10);
-		acyclicalGraph.insertEdge("C", "E", 1);
-		acyclicalGraph.insertEdge("D", "F", 1);
-		acyclicalGraph.insertEdge("D", "E", 2);
-		acyclicalGraph.insertEdge("E", "F", 10);
+		acyclicalGraph.setEdge("A", "B", 5);
+		acyclicalGraph.setEdge("A", "C", 10);
+		acyclicalGraph.setEdge("B", "C", 4);
+		acyclicalGraph.setEdge("B", "E", 5);
+		acyclicalGraph.setEdge("B", "D", 10);
+		acyclicalGraph.setEdge("C", "E", 1);
+		acyclicalGraph.setEdge("D", "F", 1);
+		acyclicalGraph.setEdge("D", "E", 2);
+		acyclicalGraph.setEdge("E", "F", 10);
 		
 		//create other instance
 		generalGraph = new DirectedWeightedGraph<String, WeightedEdge<String>>();
@@ -42,15 +42,15 @@ public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
 		generalGraph.addVertex("D");
 		generalGraph.addVertex("E");//size = 6
 		//add edges
-		generalGraph.insertEdge("A", "B", 5);
-		generalGraph.insertEdge("B", "C", 4);
-		generalGraph.insertEdge("C", "D", 7);
-		generalGraph.insertEdge("D", "C", 8);
-		generalGraph.insertEdge("D", "E", 6);
-		generalGraph.insertEdge("A", "D", 5);
-		generalGraph.insertEdge("C", "E", 2);
-		generalGraph.insertEdge("E", "B", 3);
-		generalGraph.insertEdge("A", "E", 7);
+		generalGraph.setEdge("A", "B", 5);
+		generalGraph.setEdge("B", "C", 4);
+		generalGraph.setEdge("C", "D", 7);
+		generalGraph.setEdge("D", "C", 8);
+		generalGraph.setEdge("D", "E", 6);
+		generalGraph.setEdge("A", "D", 5);
+		generalGraph.setEdge("C", "E", 2);
+		generalGraph.setEdge("E", "B", 3);
+		generalGraph.setEdge("A", "E", 7);
 	}
 		
 	@Test
@@ -71,8 +71,8 @@ public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
 	}
 	
 	@Test
-	public void testInsertEdge() throws GraphException {
-		acyclicalGraph.insertEdge("C", "D", 5);
+	public void testsetEdge() throws GraphException {
+		acyclicalGraph.setEdge("C", "D", 5);
 		List<WeightedEdge<String>> edges = acyclicalGraph.edges("C");
 		assertFalse(edges.isEmpty());
 		
@@ -83,16 +83,16 @@ public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
 	}
 	
 	@Test(expected=GraphException.class)
-	public void testInsertEdgeExceptionInvalid() throws GraphException {
+	public void testsetEdgeExceptionInvalid() throws GraphException {
 
-		acyclicalGraph.insertEdge("A", "INVALID", 5);
+		acyclicalGraph.setEdge("A", "INVALID", 5);
 	}
 	
 	@Test(expected=GraphException.class)
-	public void testInsertEdgeExceptionDuplicate() throws GraphException {
+	public void testsetEdgeExceptionDuplicate() throws GraphException {
 
-		acyclicalGraph.insertEdge("C", "D", 5);
-		acyclicalGraph.insertEdge("C", "D", 5);
+		acyclicalGraph.setEdge("C", "D", 5);
+		acyclicalGraph.setEdge("C", "D", 5);
 	}
 
 	@Test
@@ -190,4 +190,41 @@ public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
 		assertNotEquals(Integer.MAX_VALUE, acyclicalGraph.shortestPath("F", "A"));
 	}
 	
+	@Test
+	public void testEdgeCount() {
+		assertEquals(9, acyclicalGraph.edgeCount());
+	}
+	
+	@Test
+	public void testFirst() throws GraphException {
+		assertEquals("B", acyclicalGraph.first("A").getTerminal());
+	}
+	
+	@Test
+	public void testNext() throws GraphException {
+		assertEquals("E", acyclicalGraph.next("B", "C").getTerminal());
+	}
+
+	@Test
+	public void testIsEdge() throws GraphException {
+		assertTrue(acyclicalGraph.isEdge("A", "B"));
+		assertFalse(acyclicalGraph.isEdge("A", "F"));
+	}
+
+	@Test
+	public void testDelEdge() throws GraphException {
+		acyclicalGraph.delEdge("A", "C");
+		assertFalse(acyclicalGraph.isEdge("A", "C"));
+	}
+	
+	@Test
+	public void testWeight() throws GraphException {
+		assertEquals(5, acyclicalGraph.weight("A", "B"));
+	}
+	
+	@Test
+	public void testMark() {
+		acyclicalGraph.setMark("A", 999);
+		assertEquals(1, acyclicalGraph.getMark("A"));
+	}
 }

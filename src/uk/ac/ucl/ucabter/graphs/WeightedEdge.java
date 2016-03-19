@@ -27,4 +27,6 @@ public class WeightedEdge<V> {
 	public String toString() {
 		return this.terminal.toString();
 	}
+
+
 }
