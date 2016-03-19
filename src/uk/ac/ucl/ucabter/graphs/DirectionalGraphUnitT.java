@@ -180,7 +180,7 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 	}
 
 	@Test
-	public void testPathsToLessThan() {
+	public void testPathsToLessThan() throws GraphException {
 		assertEquals(5, acyclicalGraph.pathsTo("A", "F", 10, Conditions.LESSTHAN));
 		assertEquals(0, acyclicalGraph.pathsTo("A", "F", 1, Conditions.LESSTHAN));
 		
@@ -189,9 +189,11 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 	}
 	
 	@Test
-	public void testPathsToExact() {
+	public void testPathsToExact() throws GraphException {
 		assertEquals(3, acyclicalGraph.pathsTo("A", "F", 3, Conditions.EXACT));
+		assertEquals(3, generalGraph.pathsTo("A", "C", 4, Conditions.EXACT));
 	}
+	
 	
 //	@Test
 //	public void testPrint() {

@@ -19,11 +19,6 @@ public class DirectionalGraph implements Graph {
 	protected HashMap<String, LinkedList<Edge>> vertices;//record of vertices
 	protected Map<String, Boolean> mark;//record of visited bits
 	
-//	public static enum Conditions {
-//		EXACT,
-//		LESSTHAN
-//	}
-	
 	/*Inner class defining each list element as a terminal, value pair. 
 	 * The terminal is the vertex in the graph to which the edge is directed,
 	 * the integer is the cost or weight associated with the edge.*/
@@ -192,9 +187,9 @@ public class DirectionalGraph implements Graph {
 		
 		switch(c) {
 		case LESSTHAN:
-			return pathsToLessThan(start, destination, limit);
+			return pathsToLessThan(start, destination, limit - 1);
 		case EXACT:
-			//TODO
+			return pathsToExact(start, destination, limit - 1);
 		default:
 			return 0;
 		}
@@ -203,13 +198,14 @@ public class DirectionalGraph implements Graph {
 	/*Computes recursively all available paths from start to destination that 
 	 * take less than or exactly the limit parameter number of junctures*/
 	protected int pathsToLessThan(String start, String destination, int limit) {
+		//each recursion step uses its own local accumulator
 		int accumulator = 0;
 
 		//iterate through available edges from current node
 		for(Edge edge : edges(start)) {
 			
 			//stop if no of junctures is strictly larger than limit
-			if(limit <= 0)
+			if(limit < 0)
 				break;
 			
 			//increase path No accumulator if destination is reached
@@ -227,8 +223,29 @@ public class DirectionalGraph implements Graph {
 	
 	/*Computes recursively all available paths from start vertex to destination
 	 * that exactly match the limit on the number of junctures taken*/
-	protected int pathsToExactly(String start, String destination, int limit) {
-		return 0;
+	protected int pathsToExact(String start, String destination, int limit) {
+		//each recursion step uses its own local accumulator
+		int accumulator = 0;
+		
+		//iterate through available edges from current node
+		for(Edge edge : edges(start)) {
+			
+			//stop if no of junctures is strictly larger than limit
+			if(limit < 0)
+				break;
+			
+			//increase path No accumulator if destination is reached AND No of
+			//junctures matches condition
+			if(limit == 0 && edge.terminal == destination) 
+				++accumulator;
+			
+			//recurse over next available non-terminal edge
+			else if(!edges(edge.terminal).isEmpty())
+				accumulator += 
+				pathsToExact(edge.terminal, destination, limit - 1);
+		}
+		
+		return accumulator;
 	}
 	
 }
