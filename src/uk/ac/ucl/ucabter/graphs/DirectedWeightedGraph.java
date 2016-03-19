@@ -2,8 +2,6 @@ package uk.ac.ucl.ucabter.graphs;
 
 import java.util.*;
 
-import uk.ac.ucl.ucabter.graphs.DirectedWeightedGraph.Edge;
-
 /**Concrete implementation of an adjacency-list based, weighted directed 
  * graph<p>
  * 
@@ -21,44 +19,17 @@ import uk.ac.ucl.ucabter.graphs.DirectedWeightedGraph.Edge;
  * <ol>
  * <li>Calculate the length (cost) of a given route (path)</li>
  * <li>The number of possible routes between two points</li>
- * <li>The shortest route between two points</li>
+ * <li>The shortest route between two points (NOTE: assumes total distance is less 
+ * than Integer.MAX_VALUE)</li>
  * </ol><p>*/
-public class DirectedWeightedGraph<V> {
+public class DirectedWeightedGraph<V, E extends WeightedEdge<V>> 
+implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 	
 	/**Record of vertices and reachable from each*/
-	protected Map<V, List<Edge>> vertices;
+	protected Map<V, List<E>> vertices;
 	/**Record of visited vertices (used in traversal and shortest path)*/
 	protected Set<V> mark;
 	
-	/**Inner class defining each list element as a terminal, value pair. 
-	 * The terminal is the vertex in the graph to which the edge is directed,
-	 * the integer is the cost or weight associated with the edge.*/
-	protected class Edge {
-		protected V terminal;
-		protected int weight;
-		
-		/**Constructs an edge towards the terminal with the given weight.
-		 * The starting vertex is decided based on the list to which this
-		 * edge belongs*/
-		protected Edge(V terminal, int weight) {
-			this.terminal = terminal;
-			this.weight = weight;
-		}
-		
-		public V getTerminal() {
-			return terminal;
-		}
-		
-		public int getWeight()  {
-			return weight;
-		}
-	
-		@Override
-		public String toString() {
-			return this.terminal.toString();
-		}
-	}
-		
 	/**Constructs a default instance with an initial capacity of 10 that 
 	 * increases automatically*/
 	public DirectedWeightedGraph() {
@@ -71,7 +42,7 @@ public class DirectedWeightedGraph<V> {
 	}
 	
 	private void InitHashMap(int capacity) {
-		vertices = new HashMap<V, List<Edge>>(capacity);
+		vertices = new HashMap<V, List<E>>(capacity);
 	}
 		
 	/**Adds a new vertex to the graph*/
@@ -80,12 +51,12 @@ public class DirectedWeightedGraph<V> {
 	}
 	
 	private void addVertexLinkedList(V vertex) {
-		vertices.put(vertex, new LinkedList<Edge>());
+		vertices.put(vertex, new LinkedList<E>());
 	}
 	
 	/**Returns a list of all vertices reachable from this vertex*/
-	public List<Edge> edges(V vertex) {
-		List<Edge> edges = vertices.get(vertex);
+	public List<E> edges(V vertex) {
+		List<E> edges = vertices.get(vertex);
 		return (edges == null ? null : edges);
 	}
 	
@@ -98,31 +69,34 @@ public class DirectedWeightedGraph<V> {
 		if(vertices.get(destination) == null) 
 			throw new GraphException("destination vertex not in graph");
 		
-		List<Edge> edges = vertices.get(start);
-		Iterator<Edge> edgePointer = edges.iterator();
+		List<E> edges = vertices.get(start);
+		Iterator<E> edgePointer = edges.iterator();
 		
 		while(edgePointer.hasNext()) {
-			Edge current = edgePointer.next();
+			WeightedEdge<V> current = edgePointer.next();
 			//edge must not already exist
 			if(current.terminal == destination)
 				throw new 
 				GraphException("edge already exists between vertices");
 		}
 		
-		edges.add(new Edge(destination, cost));
+		E edge = (E) new WeightedEdge<V>(destination, cost);
+		edges.add(edge);
 	}
 	
-	/**Returns the cost (weight) of the edge between two directly connected 
-	 * vertices (neighbours)  */
+	/* (non-Javadoc)
+	 * @see uk.ac.ucl.ucabter.graphs.RoutableGraph#costNeighbour(V, V)
+	 */
+	@Override
 	public int costNeighbour(V start, V destination) 
 			throws GraphException {
 		int result = 0;
 		boolean found = false;
-		Iterator<Edge> edgePointer = vertices.get(start).iterator();
+		Iterator<E> edgePointer = vertices.get(start).iterator();
 		
 		//destination must be in list of vertices reachable from the start
 		while(edgePointer.hasNext()) {
-			Edge current = edgePointer.next();
+			WeightedEdge<V> current = edgePointer.next();
 			if(current.terminal == destination) {
 				result = current.weight;
 				found = true;
@@ -134,8 +108,10 @@ public class DirectedWeightedGraph<V> {
 		return result;	
 	}
 		
-	/**Returns the cost of a path between two vertices, will throw an exception 
-	 * in case the path indicated is invalid*/
+	/* (non-Javadoc)
+	 * @see uk.ac.ucl.ucabter.graphs.RoutableGraph#cost(V[])
+	 */
+	@Override
 	public int cost(V[] path) throws GraphException {
 		if(path.length <= 1)
 			throw new GraphException("path too short");
@@ -156,9 +132,9 @@ public class DirectedWeightedGraph<V> {
 		//visit action
 		visited.add(currentVertex);
 		
-		Iterator<Edge> edgePointer = vertices.get(currentVertex).iterator();
+		Iterator<E> edgePointer = vertices.get(currentVertex).iterator();
 		while(edgePointer.hasNext()) {
-			Edge current = edgePointer.next();
+			WeightedEdge<V> current = edgePointer.next();
 			if(!visited.contains(current.terminal))
 				dfTraverse(current.terminal, visited);
 		}
@@ -172,16 +148,10 @@ public class DirectedWeightedGraph<V> {
 		dfTraverse(start, mark);
 	}
 
-	/**Computes number of paths from start to destination that meet the limit 
-	 * condition. Conditions are allowed to be either EXACT or LESSTHAN, 
-	 * meaning only values that exactly match the limit parameter or are less 
-	 * than the limit parameter, respectively, will be counted. Since the graph
-	 * is directional but not acyclical (allows cycles).<p>
-	 * 
-	 * Such conditions are necessary in order to allow graph traversals to 
-	 * revisit vertices after they have been visited (allows for cyclical 
-	 * routes, that visit the same vertex multiple times) without looping 
-	 * indefinitely. */
+	/* (non-Javadoc)
+	 * @see uk.ac.ucl.ucabter.graphs.RoutableGraph#pathsTo(V, V, int, uk.ac.ucl.ucabter.graphs.Conditions)
+	 */
+	@Override
 	public int pathsTo(V start, V destination, int limit, 
 			Conditions c) throws GraphException {
 		if(vertices.get(start) == null || vertices.get(destination) == null)
@@ -204,7 +174,7 @@ public class DirectedWeightedGraph<V> {
 		int accumulator = 0;
 
 		//iterate through available edges from current node
-		for(Edge edge : edges(start)) {
+		for(WeightedEdge<V> edge : edges(start)) {
 			
 			//stop if no of junctures is strictly larger than limit
 			if(limit < 0)
@@ -230,7 +200,7 @@ public class DirectedWeightedGraph<V> {
 		int accumulator = 0;
 		
 		//iterate through available edges from current node
-		for(Edge edge : edges(start)) {
+		for(WeightedEdge<V> edge : edges(start)) {
 			
 			//stop if no of junctures is strictly larger than limit
 			if(limit < 0)
@@ -250,8 +220,10 @@ public class DirectedWeightedGraph<V> {
 		return accumulator;
 	}
 	
-	/**Calculates the length of the shortest path between two vertices in the 
-	 * graph*/
+	/* (non-Javadoc)
+	 * @see uk.ac.ucl.ucabter.graphs.RoutableGraph#shortestPath(V, V)
+	 */
+	@Override
 	public int shortestPath(V start, V destination) 
 			throws GraphException {
 		
@@ -262,6 +234,9 @@ public class DirectedWeightedGraph<V> {
 	 * structure. Delegated to by shortestPath() interface method*/
 	private int dijkstraShortestPath(V start, V destination)
 			throws GraphException {
+		if(vertices.get(start) == null || vertices.get(destination) == null)
+			throw new GraphException("No such vertex");
+		
 		//reserve memory to store distances from start to each vertex, and to
 		//keep track of which vertices have already been explored/exhausted/
 		//visited
@@ -285,7 +260,7 @@ public class DirectedWeightedGraph<V> {
 			distances.put(vertex, Integer.MAX_VALUE);
 		//then compute actual distances from starting vertex to immediately
 		//accessible vertices
-		for(Edge edge : vertices.get(start)) {
+		for(WeightedEdge<V> edge : vertices.get(start)) {
 			int cost = costNeighbour(start, edge.terminal);
 			distances.put(edge.terminal, cost);
 		}
@@ -311,6 +286,7 @@ public class DirectedWeightedGraph<V> {
 				}
 			}
 			
+			//mark current vertex as visited
 			mark.add(vertexPointer);
 			
 			//Stage 3: update distances if element is reachable from current
@@ -318,7 +294,7 @@ public class DirectedWeightedGraph<V> {
 			//shorter than recorded distance between start and element
 			//That is, if there is a shorter path to the pointer element than
 			//the one currently recorded
-			for(Edge edge : vertices.get(vertexPointer)) {
+			for(WeightedEdge<V> edge : vertices.get(vertexPointer)) {
 				int cost = costNeighbour(vertexPointer, edge.terminal);
 				int costFromStartingVertex = cost + min;
 				if(costFromStartingVertex < distances.get(edge.terminal))
@@ -326,7 +302,71 @@ public class DirectedWeightedGraph<V> {
 			}
 			
 		}
-		
-		return distances.get(destination);
+		int result = distances.get(destination);
+		if(result == Integer.MAX_VALUE)
+			throw new GraphException("No such path");
+		return result;
 	}
+
+	//WeightedGraph interface
+	@Override
+	public int vertexCount() {
+		
+		return vertices.size();
+	}
+
+	@Override
+	public int edgeCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int first(V v) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int next(V v, V w) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setEdge(V v, V w, int wght) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void delEdge(V v, V w) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isEdge(V v, V w) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public int weight(V v, V w) throws GraphException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setMark(int v, int val) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getMark(int v) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
 }

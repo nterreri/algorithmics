@@ -7,16 +7,14 @@ import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.ac.ucl.ucabter.graphs.DirectedWeightedGraph.Edge;
-
 public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
-	DirectedWeightedGraph<String> acyclicalGraph;
-	DirectedWeightedGraph<String> generalGraph;
+	DirectedWeightedGraph<String, WeightedEdge<String>> acyclicalGraph;
+	DirectedWeightedGraph<String, WeightedEdge<String>> generalGraph;
 	
 	@Before
 	public void constructInstance() throws GraphException {
 		//create instance
-		acyclicalGraph = new DirectedWeightedGraph<String>();
+		acyclicalGraph = new DirectedWeightedGraph<String, WeightedEdge<String>>();
 		//add vertices
 		acyclicalGraph.addVertex("A");
 		acyclicalGraph.addVertex("B");
@@ -36,7 +34,7 @@ public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
 		acyclicalGraph.insertEdge("E", "F", 10);
 		
 		//create other instance
-		generalGraph = new DirectedWeightedGraph<String>();
+		generalGraph = new DirectedWeightedGraph<String, WeightedEdge<String>>();
 		//add vertices
 		generalGraph.addVertex("A");
 		generalGraph.addVertex("B");
@@ -75,11 +73,11 @@ public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
 	@Test
 	public void testInsertEdge() throws GraphException {
 		acyclicalGraph.insertEdge("C", "D", 5);
-		List<DirectedWeightedGraph<String>.Edge> edges = acyclicalGraph.edges("C");
+		List<WeightedEdge<String>> edges = acyclicalGraph.edges("C");
 		assertFalse(edges.isEmpty());
 		
 		//expect D to be the second element in list of edges from D
-		Iterator<DirectedWeightedGraph<String>.Edge> pointer = edges.iterator();
+		Iterator<WeightedEdge<String>> pointer = edges.iterator();
 		pointer.next();
 		assertEquals("D", pointer.next().terminal);
 	}
@@ -184,6 +182,12 @@ public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
 		
 		assertEquals(9, generalGraph.shortestPath("A", "C"));
 		assertEquals(9, generalGraph.shortestPath("B", "B"));
+	}
+	
+	@Test(expected=GraphException.class)
+	public void testShortestPathNoPath() throws GraphException {
+//		System.out.println(acyclicalGraph.shortestPath("F", "A"));
+		assertNotEquals(Integer.MAX_VALUE, acyclicalGraph.shortestPath("F", "A"));
 	}
 	
 }
