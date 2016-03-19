@@ -19,10 +19,10 @@ public class DirectionalGraph implements Graph {
 	protected HashMap<String, LinkedList<Edge>> vertices;//record of vertices
 	protected Map<String, Boolean> mark;//record of visited bits
 	
-	public static enum Conditions {
-		EXACT,
-		LESSTHAN
-	}
+//	public static enum Conditions {
+//		EXACT,
+//		LESSTHAN
+//	}
 	
 	/*Inner class defining each list element as a terminal, value pair. 
 	 * The terminal is the vertex in the graph to which the edge is directed,

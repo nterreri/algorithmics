@@ -180,15 +180,17 @@ public class DirectionalGraphUnitT extends DirectionalGraph {
 	}
 
 	@Test
-	public void testPathsTo() {
-		assertEquals(5, acyclicalGraph.pathsTo("A", "F", 10, 
-				DirectionalGraph.Conditions.LESSTHAN));
-		assertEquals(0, acyclicalGraph.pathsTo("A", "F", 1, 
-				DirectionalGraph.Conditions.LESSTHAN));
+	public void testPathsToLessThan() {
+		assertEquals(5, acyclicalGraph.pathsTo("A", "F", 10, Conditions.LESSTHAN));
+		assertEquals(0, acyclicalGraph.pathsTo("A", "F", 1, Conditions.LESSTHAN));
 		
-		assertEquals(2, generalGraph.pathsTo("C", "C", 3, 
-				DirectionalGraph.Conditions.LESSTHAN));
+		assertEquals(2, generalGraph.pathsTo("C", "C", 3, Conditions.LESSTHAN));
 		
+	}
+	
+	@Test
+	public void testPathsToExact() {
+		assertEquals(3, acyclicalGraph.pathsTo("A", "F", 3, Conditions.EXACT));
 	}
 	
 //	@Test
