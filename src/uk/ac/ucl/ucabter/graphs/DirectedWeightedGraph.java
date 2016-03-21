@@ -38,7 +38,7 @@ import java.util.*;
  * <li>The shortest route between two points (NOTE: assumes total distance is less 
  * than Integer.MAX_VALUE)</li>
  * </ol><p>*/
-public class DirectedWeightedGraph<V, E extends WeightedEdge<V>> 
+public class DirectedWeightedGraph<V, E extends IntegerWeightEdge<V>> 
 implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 	
 	/**Record of vertices and reachable from each*/
@@ -92,7 +92,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 		
 		//destination must be in list of vertices reachable from the start
 		while(edgePointer.hasNext()) {
-			WeightedEdge<V> current = edgePointer.next();
+			IntegerWeightEdge<V> current = edgePointer.next();
 			if(current.terminal == destination) {
 				result = current.weight;
 				found = true;
@@ -130,7 +130,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 		
 		Iterator<E> edgePointer = vertices.get(currentVertex).iterator();
 		while(edgePointer.hasNext()) {
-			WeightedEdge<V> current = edgePointer.next();
+			IntegerWeightEdge<V> current = edgePointer.next();
 			if(!visited.contains(current.terminal))
 				dfTraverse(current.terminal, visited);
 		}
@@ -171,7 +171,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 		int accumulator = 0;
 
 		//iterate through available edges from current node
-		for(WeightedEdge<V> edge : edges(start)) {
+		for(IntegerWeightEdge<V> edge : edges(start)) {
 			
 			//stop if no of junctures is strictly larger than limit
 			if(limit < 0)
@@ -198,7 +198,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 		int accumulator = 0;
 		
 		//iterate through available edges from current node
-		for(WeightedEdge<V> edge : edges(start)) {
+		for(IntegerWeightEdge<V> edge : edges(start)) {
 			
 			//stop if no of junctures is strictly larger than limit
 			if(limit < 0)
@@ -263,7 +263,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 			distances.put(vertex, Integer.MAX_VALUE);
 		//then compute actual distances from starting vertex to immediately
 		//accessible vertices
-		for(WeightedEdge<V> edge : vertices.get(start)) {
+		for(IntegerWeightEdge<V> edge : vertices.get(start)) {
 			int cost = costNeighbour(start, edge.terminal);
 			distances.put(edge.terminal, cost);
 		}
@@ -297,7 +297,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 			//shorter than recorded distance between start and element
 			//That is, if there is a shorter path to the pointer element than
 			//the one currently recorded
-			for(WeightedEdge<V> edge : vertices.get(vertexPointer)) {
+			for(IntegerWeightEdge<V> edge : vertices.get(vertexPointer)) {
 				int cost = costNeighbour(vertexPointer, edge.terminal);
 				int costFromStartingVertex = cost + min;
 				if(costFromStartingVertex < distances.get(edge.terminal))
@@ -370,7 +370,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 		Iterator<E> edgePointer = edges.iterator();
 		
 		while(edgePointer.hasNext()) {
-			WeightedEdge<V> current = edgePointer.next();
+			IntegerWeightEdge<V> current = edgePointer.next();
 			//edge must not already exist
 			if(current.terminal == destination)
 				throw new 
@@ -380,7 +380,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 		
 		@SuppressWarnings("unchecked")
 		//should be safe as long as E extends WeightedEdge
-		E edge = (E) new WeightedEdge<V>(destination, cost);
+		E edge = (E) new IntegerWeightEdge<V>(destination, cost);
 		edges.add(edge);
 	}
 

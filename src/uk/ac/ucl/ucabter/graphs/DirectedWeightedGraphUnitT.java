@@ -8,13 +8,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
-	DirectedWeightedGraph<String, WeightedEdge<String>> acyclicalGraph;
-	DirectedWeightedGraph<String, WeightedEdge<String>> generalGraph;
+	DirectedWeightedGraph<String, IntegerWeightEdge<String>> acyclicalGraph;
+	DirectedWeightedGraph<String, IntegerWeightEdge<String>> generalGraph;
 	
 	@Before
 	public void constructInstance() throws GraphException {
 		//create instance
-		acyclicalGraph = new DirectedWeightedGraph<String, WeightedEdge<String>>();
+		acyclicalGraph = new DirectedWeightedGraph<String, IntegerWeightEdge<String>>();
 		//add vertices
 		acyclicalGraph.addVertex("A");
 		acyclicalGraph.addVertex("B");
@@ -34,7 +34,7 @@ public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
 		acyclicalGraph.setEdge("E", "F", 10);
 		
 		//create other instance
-		generalGraph = new DirectedWeightedGraph<String, WeightedEdge<String>>();
+		generalGraph = new DirectedWeightedGraph<String, IntegerWeightEdge<String>>();
 		//add vertices
 		generalGraph.addVertex("A");
 		generalGraph.addVertex("B");
@@ -73,11 +73,11 @@ public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
 	@Test
 	public void testsetEdge() throws GraphException {
 		acyclicalGraph.setEdge("C", "D", 5);
-		List<WeightedEdge<String>> edges = acyclicalGraph.edges("C");
+		List<IntegerWeightEdge<String>> edges = acyclicalGraph.edges("C");
 		assertFalse(edges.isEmpty());
 		
 		//expect D to be the second element in list of edges from D
-		Iterator<WeightedEdge<String>> pointer = edges.iterator();
+		Iterator<IntegerWeightEdge<String>> pointer = edges.iterator();
 		pointer.next();
 		assertEquals("D", pointer.next().terminal);
 	}
