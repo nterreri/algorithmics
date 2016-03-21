@@ -70,6 +70,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 		addVertexLinkedList(vertex);
 	}
 	
+	/**method delegated to by addVertex()*/
 	private void addVertexLinkedList(V vertex) {
 		vertices.put(vertex, new LinkedList<E>());
 	}
@@ -220,7 +221,9 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 		return accumulator;
 	}
 	
-	/***/
+	/**Computes the number of paths available from the start node to the 
+	 * destination node such that they cost strictly less than the limit 
+	 * parameter in terms of path length/cost/weight*/
 	protected int pathsToLessThanCost(V start, V destination, int limit) {
 		//each recursion step uses its own local accumulator, accumulator 
 		//stores No of discovered routes meeting the condition on the limit
@@ -251,6 +254,9 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 				//recurse over next available non-terminal edge, since loops are
 				//allowed, the recursion is not an alternative, but something to
 				//always do whenever possible, until limit is reached!
+				//removing the "else" in the same section of the other methods
+				//such as pathsToLessThan() and pathsToExact() does not break
+				//the unit tests
 				if(!edges(edge.terminal).isEmpty())
 					accumulator += 
 					pathsToLessThanCost(edge.terminal, destination, 

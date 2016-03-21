@@ -107,8 +107,8 @@ public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
 	
 	@Test
 	public void testCost() throws GraphException {
-		String[] path = {"A", "B", "D"};
-		assertEquals(15, acyclicalGraph.cost(path));
+		String[] path1 = {"A", "B", "D"};
+		assertEquals(15, acyclicalGraph.cost(path1));
 		
 		String[] path2 = {"B", "D", "E", "F"};
 		assertEquals(22, acyclicalGraph.cost(path2));
@@ -118,12 +118,27 @@ public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
 
 		String[] path4 = {"A", "B", "E", "F"};
 		assertEquals(20, acyclicalGraph.cost(path4));
+		
+		String[] path5 = {"A", "B", "C"};
+		assertEquals(9, generalGraph.cost(path5));
+
+		String[] path6 = {"A", "D"};
+		assertEquals(5, generalGraph.cost(path6));
+		
+		String[] path7 = {"A", "D", "C"};
+		assertEquals(13, generalGraph.cost(path7));
+		
+		String[] path8 = {"A", "E", "B", "C", "D"};
+		assertEquals(21, generalGraph.cost(path8));
 	}
 	
 	@Test(expected=GraphException.class)
 	public void testCostNoSuchPath() throws GraphException {
-		String[] path = {"A", "B", "F"};
-		assertEquals(15, acyclicalGraph.cost(path));
+//		String[] path1 = {"A", "B", "F"};
+//		assertEquals(15, acyclicalGraph.cost(path1));
+		
+		String[] path2 = {"A", "E", "D"};
+		assertEquals(77, generalGraph.cost(path2));
 	}
 	
 	@Test(expected=GraphException.class)
