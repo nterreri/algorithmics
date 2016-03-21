@@ -135,24 +135,24 @@ public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
 	
 	@Test
 	public void testDFTraverse() {
-		Set<String> visited = new HashSet<String>();
+//		Set<String> visited = new HashSet<String>();
 		
-		acyclicalGraph.dfTraverse("A", visited);
-		assertTrue(visited.contains("A"));
-		assertTrue(visited.contains("B"));
-		assertTrue(visited.contains("C"));
-		assertTrue(visited.contains("D"));
-		assertTrue(visited.contains("E"));
-		assertTrue(visited.contains("F"));
+		acyclicalGraph.doTraversal("A");
+		assertTrue(acyclicalGraph.mark.contains("A"));
+		assertTrue(acyclicalGraph.mark.contains("B"));
+		assertTrue(acyclicalGraph.mark.contains("C"));
+		assertTrue(acyclicalGraph.mark.contains("D"));
+		assertTrue(acyclicalGraph.mark.contains("E"));
+		assertTrue(acyclicalGraph.mark.contains("F"));
 
-		visited = new HashSet<String>();
-		acyclicalGraph.dfTraverse("D", visited);
-		assertFalse(visited.contains("A"));
-		assertFalse(visited.contains("B"));
-		assertFalse(visited.contains("C"));
-		assertTrue(visited.contains("D"));
-		assertTrue(visited.contains("E"));
-		assertTrue(visited.contains("F"));
+//		visited = new HashSet<String>();
+		acyclicalGraph.doTraversal("D");
+		assertFalse(acyclicalGraph.mark.contains("A"));
+		assertFalse(acyclicalGraph.mark.contains("B"));
+		assertFalse(acyclicalGraph.mark.contains("C"));
+		assertTrue(acyclicalGraph.mark.contains("D"));
+		assertTrue(acyclicalGraph.mark.contains("E"));
+		assertTrue(acyclicalGraph.mark.contains("F"));
 		
 	}
 
@@ -226,5 +226,17 @@ public class DirectedWeightedGraphUnitT extends DirectedWeightedGraph {
 	public void testMark() {
 		acyclicalGraph.setMark("A", 999);
 		assertEquals(1, acyclicalGraph.getMark("A"));
+	}
+
+	@Test
+	public void testPathsToLessThanCost() throws GraphException {
+		assertEquals(1, acyclicalGraph.pathsTo("A", "F", 20, Conditions.COST_LESSTHAN));
+		assertEquals(3, acyclicalGraph.pathsTo("A", "F", 21, Conditions.COST_LESSTHAN));
+		assertEquals(2, acyclicalGraph.pathsTo("B", "E", 9, Conditions.COST_LESSTHAN));
+		assertEquals(2, generalGraph.pathsTo("C", "C", 16, Conditions.COST_LESSTHAN));
+		assertEquals(3, generalGraph.pathsTo("C", "C", 19, Conditions.COST_LESSTHAN));
+		assertEquals(4, generalGraph.pathsTo("C", "C", 21, Conditions.COST_LESSTHAN));
+		assertEquals(6, generalGraph.pathsTo("C", "C", 25, Conditions.COST_LESSTHAN));
+		assertEquals(9, generalGraph.pathsTo("C", "C", 30, Conditions.COST_LESSTHAN));
 	}
 }

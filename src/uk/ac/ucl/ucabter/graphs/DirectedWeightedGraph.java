@@ -122,7 +122,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 	/**Visits the graph depth-first from currentVertex parameter, returns a 
 	 * record of vertices visited as a map from vertices labes to true boolean
 	 * objects */
-	protected void dfTraverse(V currentVertex, 
+	private void dfTraverse(V currentVertex, 
 			Set<V> visited) {
 		
 		//visit action
@@ -158,6 +158,8 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 			return pathsToLessThan(start, destination, limit - 1);
 		case EXACT:
 			return pathsToExact(start, destination, limit - 1);
+		case COST_LESSTHAN:
+			return pathsToLessThanCost(start, destination, limit - 1); //limit -1?
 		default:
 			return 0;
 		}
@@ -220,8 +222,52 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 	
 	/***/
 	protected int pathsToLessThanCost(V start, V destination, int limit) {
-		//TODO
-		return 0;
+		//each recursion step uses its own local accumulator, accumulator 
+		//stores No of discovered routes meeting the condition on the limit
+		int accumulator = 0;
+
+		//iterate through available edges from current node
+		for(IntegerWeightEdge<V> edge : edges(start)) {
+
+			//stop if cost is strictly larger than limit
+			if(limit < 0)
+				break;
+
+			//increase cost accumulator if destination is reached, limit must 
+			//also be checked as final step may be too costly to count. Using
+			//costNeighbour may cause an exception, but should not occur since 
+			//at this stage is known that destination is a terminal in at least
+			//one edge from the current start vertex
+			try {
+				if(edge.terminal == destination) {
+					if(!(limit - costNeighbour(start, destination) < 0))
+						++accumulator;
+						//skip to next iteration if current edge to destination
+						//is too costly
+					else
+						continue;
+				}
+
+				//recurse over next available non-terminal edge, since loops are
+				//allowed, the recursion is not an alternative, but something to
+				//always do whenever possible, until limit is reached!
+				if(!edges(edge.terminal).isEmpty())
+					accumulator += 
+					pathsToLessThanCost(edge.terminal, destination, 
+							limit - costNeighbour(start, edge.terminal));
+			} catch (GraphException e) {
+				//costNeighbour will throw an exception if the relevant edge 
+				//has been deleted between the time that the current recursion 
+				//and iteration over the edges steps began 
+				//should not occur unless edges are deleted concurrently while
+				//the present method is in progress
+				throw new ConcurrentModificationException("Edge deleted from "
+						+ this.getClass().getName() + " graph during global "
+								+ "graph instance state read");
+			}
+		}
+
+		return accumulator;
 	}
 	/* (non-Javadoc)
 	 * @see uk.ac.ucl.ucabter.graphs.RoutableGraph#shortestPath(V, V)
@@ -235,7 +281,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 	
 	/**Implementation of Dijkstra's algorithm based on Map to Lists graph 
 	 * structure. Delegated to by shortestPath() interface method*/
-	private int dijkstraShortestPath(V start, V destination)
+	protected int dijkstraShortestPath(V start, V destination)
 			throws GraphException {
 		if(vertices.get(start) == null || vertices.get(destination) == null)
 			throw new GraphException("No such vertex");
@@ -448,6 +494,7 @@ implements RoutableGraph<V, E>, WeightedGraph<V, E> {
 		mark.add(v);
 	}
 	@Override
+	
 	public int getMark(V v) {
 		if(mark.contains(v))
 			return 1;
