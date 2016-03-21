@@ -8,13 +8,20 @@ cyclical)
 3. Calculate the length of the shortest route between two vertices
 
 In order to run the demo file (DirectedWeightedGraphDemoJUnit.java) it is 
-necessary to have a platform from which to run JUnit tests over Java files.
+necessary to have a platform from which to run JUnit tests over Java classes.
 One way to do this is to download a distribution of eclipse that supports Java 
 (see https://eclipse.org/downloads/), import the package into an eclipse workspace 
 (see http://agile.csc.ncsu.edu/SEMaterials/tutorials/import_export/) and run the 
-demo file. There should be distributions of eclipse available for any OS 
-(including Windows and Mac), eclipse distribution that support Java programming
+demo file. There should be distributions of eclipse available for most OS's 
+(including Windows and Mac), eclipse distributions that support Java programming
 should automatically support JUnit as a testing framework.
 
-A more comprehensive set of tests against the rest of the implementation can be
-found in another JUnit test case file: DirectedWeightedGraphUnitT.Java
+A more comprehensive set of tests than the demo, which tests the rest of the
+implementation, can be found in another JUnit test case file: 
+DirectedWeightedGraphUnitT.Java
+
+A separate repository has also been created for ease of access: 
+https://github.com/nterreri/java-graph
+
+However, the original repository directory contains the full history of changes:
+https://github.com/nterreri/algorithmics/tree/master/src/uk/ac/ucl/ucabter/graphs
